@@ -1,4 +1,5 @@
 using GrpcServiceExample.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
 // Add services to the container.
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(options =>
+{
+    options.EnableDetailedErrors = true; // Включить подробные сообщения об ошибках
+}).Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxConcurrentConnections = 100; // Set the maximum number of concurrent connections
+    options.Limits.MaxConcurrentUpgradedConnections = 100; // Set the maximum number of concurrent upgraded (WebSocket) connections
+});
 
 var app = builder.Build();
 
